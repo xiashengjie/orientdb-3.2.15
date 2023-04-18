@@ -1,0 +1,23 @@
+{
+  "config": {
+  "log": "debug"
+  },
+  "source": { "file": { "path": "Z:/Unibench/SF30/Dataset/Vendor/Vendor.csv" } },
+  "extractor": { "csv": {"separator": ","} },
+  "transformers": [
+    { "vertex": { "class": "Vendor" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "plocal:../databases/testSF30",
+       "dbType": "graph",
+	          "dbUser":"root",
+       "dbPassword":"root",
+       "classes": [
+         {"name": "Vendor", "extends": "V"}
+       ], "indexes": [
+         {"class":"Vendor", "fields":["id:string"], "type":"UNIQUE" }
+       ]
+    }
+  }
+}

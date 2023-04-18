@@ -1,0 +1,18 @@
+{
+  "source": { "file": { "path": "Z:/Unibench/SF30/Dataset/Feedback/Feedback.csv" } },
+  "extractor": { "csv": {"separator": "|"} },
+  "transformers": [
+    { "vertex": { "class": "Feedback" } }
+  ],
+  "loader": {
+    "orientdb": {
+       "dbURL": "plocal:../databases/testSF30",
+       "dbType": "graph",
+       "dbUser":"root",
+       "dbPassword":"root",
+       "classes": [
+         {"name": "vendor", "extends": "V"}
+       ]
+    }
+  }
+}

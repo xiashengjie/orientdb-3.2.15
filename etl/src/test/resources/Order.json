@@ -1,0 +1,32 @@
+{
+  "config": {
+    "log": "debug"
+  },
+  "source" : {
+    "file": { "path": "Z:/Unibench/SF1/Dataset/Order/Order.json" }
+  },
+  "extractor" : {
+      "row": {"multiLine": false}
+},
+  "transformers": [
+  {"log": {}},
+	{"code": {"language": "Javascript","code": "db.newInstance().fromJSON(input);"}
+	},
+    {"json": {} },
+    { "vertex": { "class": "Order" } }
+  ],
+  "loader" : {
+    "orientdb": {
+      "dbURL": "plocal:../databases/test",
+      "wal": false,
+      "dbType": "graph",
+      "dbUser":"root",
+       "dbPassword":"root",
+       "classes": [
+         {"name": "Order", "extends": "V"}
+       ], "indexes": [
+         {"class":"Order", "fields":["OrderId:string"], "type":"UNIQUE" }
+       ]
+    }
+	}
+}
