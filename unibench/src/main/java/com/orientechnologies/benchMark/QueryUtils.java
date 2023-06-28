@@ -42,7 +42,7 @@ public class QueryUtils {
     /**
      * 执行对应查询
      */
-    public static void runQuery(String query,String database) throws Exception{
+    public static void runQuery(String query,OrientdbEnum orientdbEnum) throws Exception{
         MMDB db = new OrientQuery();
         System.out.println(query+" is running");
         Path currentDir = Paths.get(".");
@@ -51,23 +51,23 @@ public class QueryUtils {
                 List<String> P1;
                     P1 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/PersonIds"));
                     String personIdQ1 = randomChoice(P1.toArray(new String[0]));
-                    db.Q1(personIdQ1,database);
+                    db.Q1(personIdQ1,orientdbEnum);
                 break;
             case "Q2":
                 List<String> P2;
                     P2 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/ProductIds"));
                     String productIdQ2 = randomChoice(P2.toArray(new String[0]));
-                    db.Q2(productIdQ2,database);
+                    db.Q2(productIdQ2,orientdbEnum);
                 break;
             case "Q3":
                 List<String> P3;
                     P3 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/ProductIds"));
                     String productIdQ3 = randomChoice(P3.toArray(new String[0]));
-                    db.Q3(productIdQ3,database);
+                    db.Q3(productIdQ3,orientdbEnum);
                 break;
             case "Q4":
                 List<String> P4;
-                    db.Q4(database);
+                    db.Q4(orientdbEnum);
                 break;
             case "Q5":
                 List<String> P5_1;
@@ -76,29 +76,29 @@ public class QueryUtils {
                     P5_2 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/Brands"));
                     String personIdQ5 = randomChoice(P5_1.toArray(new String[0]));
                     String brandQ5 = randomChoice(P5_2.toArray(new String[0]));
-                    db.Q5(personIdQ5,brandQ5,database);
+                    db.Q5(personIdQ5,brandQ5,orientdbEnum);
                 break;
             case "Q6":
                 List<String> P6;
                     P6 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/PersonIds"));
                     String srcQ6 = randomChoice(P6.toArray(new String[0]));
                     String dstQ6 = randomChoice(P6.toArray(new String[0]));
-                    db.Q6(srcQ6, dstQ6,database);
+                    db.Q6(srcQ6, dstQ6,orientdbEnum);
                 break;
             case "Q7":
                 List<String> P7;
                     P7 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/Brands"));
                     String brandQ7 = randomChoice(P7.toArray(new String[0]));
-                    db.Q7(brandQ7,database);
+                    db.Q7(brandQ7,orientdbEnum);
                 break;
             case "Q8":
-                    db.Q8(database);
+                    db.Q8(orientdbEnum);
                 break;
             case "Q9":
-                    db.Q9(database);
+                    db.Q9(orientdbEnum);
                 break;
             case "Q10":
-                    db.Q10(database);
+                    db.Q10(orientdbEnum);
                 break;
             default:break;
         }
@@ -158,7 +158,7 @@ public class QueryUtils {
         status[0] = "success";
         try {
             System.out.println("----------------查询执行中---------------");
-            runQuery(query,database);
+            runQuery(query,orientdbEnum);
             System.out.println("----------------查询执行完毕---------------");
         }catch (ODatabaseException e){
             status[0] = "failed";
