@@ -824,6 +824,7 @@ public class ONetworkProtocolBinary extends ONetworkProtocol {
                   t.toString());
       }
     } catch (Exception e) {
+      System.out.println(e);
       if (e instanceof SocketException) shutdown();
       else OLogManager.instance().error(this, "Error during sending an error to client", e);
     } finally {

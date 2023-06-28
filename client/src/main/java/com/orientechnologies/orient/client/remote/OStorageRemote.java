@@ -537,6 +537,7 @@ public class OStorageRemote implements OStorageProxy, ORemotePushHandler, OStora
         }
         serverUrl = null;
       } catch (IOException | OIOException e) {
+        System.out.println(e);
         OLogManager.instance()
             .info(
                 this,
