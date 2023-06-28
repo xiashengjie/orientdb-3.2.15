@@ -21,7 +21,7 @@ public class QueryTest {
         QueryUtils.printInfo();
         // Create a thread pool
         String query = QueryUtils.randomChoice(QUERY_LIST);
-        QueryUtils.resultToFile(OrientdbEnum.SF1,query,0,true);
+        QueryUtils.resultToFile(OrientdbEnum.SF30,query,0,true);
     }
 
     @Test

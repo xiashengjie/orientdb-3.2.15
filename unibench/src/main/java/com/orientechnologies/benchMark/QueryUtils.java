@@ -42,7 +42,7 @@ public class QueryUtils {
     /**
      * 执行对应查询
      */
-    public static void runQuery(String query,String database) throws ODatabaseException,IOException{
+    public static void runQuery(String query,String database) throws Exception{
         MMDB db = new OrientQuery();
         System.out.println(query+" is running");
         Path currentDir = Paths.get(".");
@@ -170,6 +170,7 @@ public class QueryUtils {
         }catch (Exception e){
             status[0] = "failed";
             System.out.println("----------------查询执行失败---------------");
+            System.out.println(e);
             e.printStackTrace();
         }finally {
             millisEnd[0] = System.currentTimeMillis();
@@ -296,6 +297,14 @@ public class QueryUtils {
         System.out.println(result1);
         System.out.println(result2);
         System.out.println(result3);
+        if(!result.contains("Error")){
+            try {
+                Thread.sleep(180000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public static void startOrientdb(){
@@ -314,7 +323,6 @@ public class QueryUtils {
         try {
             System.out.println("----------------刷新环境中---------------");
             cleanCache();
-            Thread.sleep(180000);
             startOrientdb();
             Thread.sleep(120000);
             System.out.println("----------------刷新环境成功---------------");
