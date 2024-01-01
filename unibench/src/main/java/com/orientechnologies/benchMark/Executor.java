@@ -29,12 +29,13 @@ public class Executor implements Job{
 		try {
 			QueryUtils.printInfo();
 			String [] queryList = new String[]{"Q1","Q2","Q3","Q4","Q5","Q6","Q8","Q9","Q10"};
-
+			long currentTimeMillis = System.currentTimeMillis();
+			String taskName = "task"+currentTimeMillis;
 			//并发数
 			int threads = 0;
 			for (String query : queryList) {
 				QueryUtils.refreshEnv();
-				QueryUtils.resultToFile(OrientdbEnum.SF30,query,threads, true);
+				//QueryUtils.resultToFile(taskName,OrientdbEnum.SF30,query,threads, true,false);
 				Thread.sleep(60000);
 			}
 		}catch (Exception e){

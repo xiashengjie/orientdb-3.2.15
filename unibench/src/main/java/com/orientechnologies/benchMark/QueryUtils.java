@@ -3,8 +3,8 @@ package com.orientechnologies.benchMark;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-import com.orientechnologies.orient.core.exception.ODatabaseException;
 import com.orientechnologies.utils.ConfigUtils;
+import com.orientechnologies.utils.CpolarUtils;
 import com.orientechnologies.utils.OrientdbEnum;
 import com.orientechnologies.utils.PropertiesEnum;
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +16,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -26,9 +27,7 @@ import java.util.Properties;
 public class QueryUtils {
     private static final Logger log = LoggerFactory.getLogger(QueryUtils.class);
     private static final String DEFAULT_CHART="UTF-8";
-    final static long[] millisStart = new long[1];
-    final static long[] millisEnd = new long[1];
-    final static String[] status = new String[1];
+
 
 
 
@@ -42,33 +41,31 @@ public class QueryUtils {
     /**
      * 执行对应查询
      */
-    public static void runQuery(String query,String database) throws Exception{
-        MMDB db = new OrientQuery();
+    public static long runQuery(String query,OrientdbEnum orientdbEnum,String  dbUrl) throws Exception{
+//           MMDB db = new OrientQueryNew();
+           MMDB db = new OrientQuery();
         System.out.println(query+" is running");
+//        String dbUrl = "";
         Path currentDir = Paths.get(".");
         switch(query) {
             case "Q1":
                 List<String> P1;
                     P1 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/PersonIds"));
                     String personIdQ1 = randomChoice(P1.toArray(new String[0]));
-                    db.Q1(personIdQ1,database);
-                break;
+                    return db.Q1(personIdQ1,orientdbEnum,dbUrl);
             case "Q2":
                 List<String> P2;
                     P2 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/ProductIds"));
                     String productIdQ2 = randomChoice(P2.toArray(new String[0]));
-                    db.Q2(productIdQ2,database);
-                break;
+                    return db.Q2(productIdQ2,orientdbEnum,dbUrl);
             case "Q3":
                 List<String> P3;
                     P3 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/ProductIds"));
                     String productIdQ3 = randomChoice(P3.toArray(new String[0]));
-                    db.Q3(productIdQ3,database);
-                break;
+                    return db.Q3(productIdQ3,orientdbEnum,dbUrl);
             case "Q4":
                 List<String> P4;
-                    db.Q4(database);
-                break;
+                    return db.Q4(orientdbEnum,dbUrl);
             case "Q5":
                 List<String> P5_1;
                 List<String> P5_2;
@@ -76,42 +73,43 @@ public class QueryUtils {
                     P5_2 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/Brands"));
                     String personIdQ5 = randomChoice(P5_1.toArray(new String[0]));
                     String brandQ5 = randomChoice(P5_2.toArray(new String[0]));
-                    db.Q5(personIdQ5,brandQ5,database);
-                break;
+                    return db.Q5(personIdQ5,brandQ5,orientdbEnum,dbUrl);
             case "Q6":
                 List<String> P6;
                     P6 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/PersonIds"));
                     String srcQ6 = randomChoice(P6.toArray(new String[0]));
                     String dstQ6 = randomChoice(P6.toArray(new String[0]));
-                    db.Q6(srcQ6, dstQ6,database);
-                break;
+                    return db.Q6(srcQ6, dstQ6,orientdbEnum,dbUrl);
             case "Q7":
                 List<String> P7;
                     P7 = Files.readAllLines(Paths.get(currentDir.toAbsolutePath()+"/Brands"));
                     String brandQ7 = randomChoice(P7.toArray(new String[0]));
-                    db.Q7(brandQ7,database);
-                break;
+                    return db.Q7(brandQ7,orientdbEnum,dbUrl);
             case "Q8":
-                    db.Q8(database);
-                break;
+                    return db.Q8(orientdbEnum,dbUrl);
             case "Q9":
-                    db.Q9(database);
-                break;
+                    return db.Q9(orientdbEnum,dbUrl);
             case "Q10":
-                    db.Q10(database);
-                break;
+                    return db.Q10(orientdbEnum,dbUrl);
             default:break;
         }
+        return 0;
     }
 
 
     /**
      * 将结果写入文件
      */
-    public static void writeToFile(String database,String query,long millisStart,long millisEnd,int n,String status,boolean cacheClean){
+    public static void writeToFile(String taskName,String database,String query,long millisStart,long millisEnd,int n,String status,boolean cacheClean,boolean mixed){
         try{
-            String content = String.format("%s,%s,%s,%s,%s,%s\n",query,millisStart,millisEnd,n,status,cacheClean);
-            File file =new File(database+".txt");
+            Properties properties = ConfigUtils.getConfig(PropertiesEnum.ORIENTDB);
+            long time = millisEnd - millisStart;
+            String content = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+                    taskName,database,query,millisStart,millisEnd,time,n,status,
+                    cacheClean,mixed,properties.getProperty("orientdb.cpu"),
+                    properties.getProperty("orientdb.pod"),
+                    properties.getProperty("minio.pod"));
+            File file =new File("orientdb-juicefs-new.txt");
             if(!file.exists()){
                 file.createNewFile();
             }
@@ -136,48 +134,88 @@ public class QueryUtils {
     }
 
     public static void refreshDatabase(OrientdbEnum orientdbEnum){
-        Properties sshConfig = ConfigUtils.getConfig(PropertiesEnum.SSH);
-        Connection sshConnectionNode3 = login(sshConfig.getProperty("node3.url"), Integer.parseInt(sshConfig.getProperty("node3.port")));
+        HashMap<String, String> sshUrl = CpolarUtils.getSSHUrl();
+        Connection sshConnection = login(sshUrl.get("node3.url"), Integer.parseInt(sshUrl.get("node3.port")));
+        //Connection sshConnection2 = login(sshUrl.get("node3.url"), Integer.parseInt(sshUrl.get("node3.port")));
         String command = orientdbEnum.getRefreshCmd();
+        //String[] split = command.split(";");
+
         System.out.println("---------------刷新数据库 "+orientdbEnum.getName()+" 中---------------");
-        String result = execute(sshConnectionNode3, command);
+        String result = execute(sshConnection, command);
+        //String result2 = execute(sshConnection2, split[1]);
         System.out.println(result);
+        //System.out.println(result2);
         System.out.println("刷新完毕");
+        sshConnection.close();
+        //sshConnection2.close();
     }
 
+    public static void reboot(){
+        HashMap<String, String> sshUrl = CpolarUtils.getSSHUrl();
+        Connection sshConnection1 = login(sshUrl.get("master.url"), Integer.parseInt(sshUrl.get("master.port")));
+        Connection sshConnection2 = login(sshUrl.get("node1.url"), Integer.parseInt(sshUrl.get("node1.port")));
+        Connection sshConnection3 = login(sshUrl.get("node2.url"), Integer.parseInt(sshUrl.get("node2.port")));
+        Connection sshConnection4 = login(sshUrl.get("node3.url"), Integer.parseInt(sshUrl.get("node3.port")));
+        Properties config = ConfigUtils.getConfig(PropertiesEnum.COMMAND);
+        String reboot = config.getProperty("reboot");
+        System.out.println("重启所有机器");
+        String result1 = execute(sshConnection1, reboot);
+        String result2 = execute(sshConnection2, reboot);
+        String result3 = execute(sshConnection3, reboot);
+        String result4 = execute(sshConnection4, reboot);
+
+        System.out.println(result1);
+        System.out.println(result2);
+        System.out.println(result3);
+        System.out.println(result4);
+
+
+    }
 
     /**
      * 执行查询并将结果写入文件
      */
-    public static void resultToFile(OrientdbEnum orientdbEnum,String query, int threads, boolean cacheClean){
+    public static void resultToFile(String taskName,OrientdbEnum orientdbEnum,String query, int threads, boolean cacheClean,boolean mixed,String  dbUrl){
+        long[] millisStart = new long[1];
+        long[] millisEnd = new long[1];
+        String[] status = new String[1];
         String database = orientdbEnum.getName();
         System.out.println("数据库是："+database);
         System.out.println("将要执行的查询是："+query);
 
-        millisStart[0] = System.currentTimeMillis();
+
         status[0] = "success";
         try {
             System.out.println("----------------查询执行中---------------");
-            runQuery(query,database);
+            millisStart[0] = System.currentTimeMillis();
+            long time  = runQuery(query, orientdbEnum, dbUrl);
+            if(time<0){
+                time = -time;
+            }
+            millisEnd[0] = millisStart[0]+time;
             System.out.println("----------------查询执行完毕---------------");
-        }catch (ODatabaseException e){
+        }
+//        catch (ODatabaseException e){
+//            status[0] = "failed";
+//            System.out.println("----------------数据库 "+database+" 被更改，查询执行失败---------------");
+//            e.printStackTrace();
+//            refreshDatabase(orientdbEnum);
+//            System.out.println("----------------重新执行查询---------------");
+//            resultToFile(orientdbEnum,query,threads,cacheClean);
+//        }
+        catch (Exception e){
             status[0] = "failed";
-            System.out.println("----------------数据库 "+database+" 被更改，查询执行失败---------------");
-            e.printStackTrace();
-            refreshDatabase(orientdbEnum);
-            System.out.println("----------------重新执行查询---------------");
-            resultToFile(orientdbEnum,query,threads,cacheClean);
-        }catch (Exception e){
-            status[0] = "failed";
+            millisEnd[0] = System.currentTimeMillis();
             System.out.println("----------------查询执行失败---------------");
             System.out.println(e);
             e.printStackTrace();
+
+//            QueryUtils.refreshDatabase(orientdbEnum);
+//            resultToFile(taskName,orientdbEnum,query,threads,cacheClean,mixed);
         }finally {
-            millisEnd[0] = System.currentTimeMillis();
-            writeToFile(database,query, millisStart[0], millisEnd[0],threads,status[0],cacheClean);
+            writeToFile(taskName,database,query, millisStart[0], millisEnd[0],threads,status[0],cacheClean,mixed);
         }
     }
-
 
 
     /**
@@ -269,11 +307,12 @@ public class QueryUtils {
 
     public static void cleanCache(){
 
-        Properties sshConfig = ConfigUtils.getConfig(PropertiesEnum.SSH);
-        Connection sshConnectionMaster = login(sshConfig.getProperty("master.url"), Integer.parseInt(sshConfig.getProperty("master.port")));
-        Connection sshConnectionNode1 = login(sshConfig.getProperty("node1.url"), Integer.parseInt(sshConfig.getProperty("node1.port")));
-        Connection sshConnectionNode2 = login(sshConfig.getProperty("node2.url"), Integer.parseInt(sshConfig.getProperty("node2.port")));
-        Connection sshConnectionNode3 = login(sshConfig.getProperty("node3.url"), Integer.parseInt(sshConfig.getProperty("node3.port")));
+        HashMap<String, String> sshUrl = CpolarUtils.getSSHUrl();
+
+        Connection sshConnectionMaster = login(sshUrl.get("master.url"), Integer.parseInt(sshUrl.get("master.port")));
+        Connection sshConnectionNode1 = login(sshUrl.get("node1.url"), Integer.parseInt(sshUrl.get("node1.port")));
+        Connection sshConnectionNode2 = login(sshUrl.get("node2.url"), Integer.parseInt(sshUrl.get("node2.port")));
+        Connection sshConnectionNode3 = login(sshUrl.get("node3.url"), Integer.parseInt(sshUrl.get("node3.port")));
 
 
         Properties commandConfig = ConfigUtils.getConfig(PropertiesEnum.COMMAND);
@@ -299,7 +338,48 @@ public class QueryUtils {
         System.out.println(result3);
         if(!result.contains("Error")){
             try {
-                Thread.sleep(180000);
+                Thread.sleep(120000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void cleanCacheJuiceFs(){
+
+        HashMap<String, String> sshUrl = CpolarUtils.getSSHUrl();
+
+        Connection sshConnectionMaster = login(sshUrl.get("master.url"), Integer.parseInt(sshUrl.get("master.port")));
+        Connection sshConnectionNode1 = login(sshUrl.get("node1.url"), Integer.parseInt(sshUrl.get("node1.port")));
+        Connection sshConnectionNode2 = login(sshUrl.get("node2.url"), Integer.parseInt(sshUrl.get("node2.port")));
+        Connection sshConnectionNode3 = login(sshUrl.get("node3.url"), Integer.parseInt(sshUrl.get("node3.port")));
+
+
+        Properties commandConfig = ConfigUtils.getConfig(PropertiesEnum.COMMAND);
+        /*master*/
+        String commandMaster = commandConfig.getProperty("cleanAlluxio");
+
+        /*node*/
+        String commandNode = commandConfig.getProperty("deleteCache");
+
+        String result = execute(sshConnectionMaster, commandMaster);
+        String result1 = execute(sshConnectionNode1, commandNode);
+        String result2 = execute(sshConnectionNode2, commandNode);
+        String result3 = execute(sshConnectionNode3, commandNode);
+
+        sshConnectionMaster.close();
+        sshConnectionNode1.close();
+        sshConnectionNode2.close();
+        sshConnectionNode3.close();
+
+        System.out.println(result);
+        System.out.println(result1);
+        System.out.println(result2);
+        System.out.println(result3);
+        if(!result.contains("Error")){
+            try {
+                Thread.sleep(120000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -309,14 +389,21 @@ public class QueryUtils {
 
     public static void startOrientdb(){
 
-        Properties sshConfig = ConfigUtils.getConfig(PropertiesEnum.SSH);
-        Connection sshConnectionMaster = login(sshConfig.getProperty("master.url"), Integer.parseInt(sshConfig.getProperty("master.port")));
 
+        HashMap<String, String> sshUrl = CpolarUtils.getSSHUrl();
+        Connection sshConnectionMaster = login(sshUrl.get("master.url"), Integer.parseInt(sshUrl.get("master.port")));
         Properties config = ConfigUtils.getConfig(PropertiesEnum.COMMAND);
         String startOrientDB = config.getProperty("startOrientDB");
 
         String result = execute(sshConnectionMaster, startOrientDB);
         System.out.println(result);
+        if(result.contains("created")){
+            try {
+                Thread.sleep(180000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void refreshEnv(){

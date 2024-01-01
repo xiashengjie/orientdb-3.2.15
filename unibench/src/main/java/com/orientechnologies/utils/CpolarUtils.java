@@ -82,23 +82,25 @@ public class CpolarUtils {
         return urls;
     }
 
-    public static void getSSHUrl(){
-        Properties properties = new Properties();
+    public static HashMap<String, String> getSSHUrl(){
+        HashMap<String, String> map = new HashMap<>(8);
+        //Properties properties = new Properties();
+
         ArrayList<String> ssh = getUrlListByName("ssh");
         Properties commandConfig = ConfigUtils.getConfig(PropertiesEnum.COMMAND);
         String cmd = commandConfig.getProperty("hostname");
-        int threads = 4;
-        ExecutorService executor = new ThreadPoolExecutor(
-                threads,
-                threads+5,
-                3,
-                TimeUnit.SECONDS,
-                new LinkedBlockingDeque<>(3),
-                Executors.defaultThreadFactory(),
-                new ThreadPoolExecutor.DiscardOldestPolicy());
+//        int threads = 4;
+//        ExecutorService executor = new ThreadPoolExecutor(
+//                threads,
+//                threads+5,
+//                3,
+//                TimeUnit.SECONDS,
+//                new LinkedBlockingDeque<>(3),
+//                Executors.defaultThreadFactory(),
+//                new ThreadPoolExecutor.DiscardOldestPolicy());
 
         for (String s : ssh) {
-            executor.submit(() -> {
+           // executor.submit(() -> {
                 String[] split = s.split(":");
                 String url = split[0];
                 String port = split[1];
@@ -109,19 +111,27 @@ public class CpolarUtils {
                 System.out.println("------------"+result+"-----------");
                 System.out.println("------------"+url+"-----------");
                 System.out.println("------------"+port+"-----------");
-                ConfigUtils.setConfig(properties,PropertiesEnum.SSH,urlP,url);
-                ConfigUtils.setConfig(properties,PropertiesEnum.SSH,portP,port);
+                map.put(urlP,url);
+                map.put(portP,port);
+//                ConfigUtils.setConfig(properties,PropertiesEnum.SSH,urlP,url);
+//                ConfigUtils.setConfig(properties,PropertiesEnum.SSH,portP,port);
+
                 connection.close();
-            });
+           // });
         }
-        executor.shutdown();
+       // executor.shutdown();
+        return map;
     }
 
-    public static void getOrientdbUrl(){
-        Properties properties = new Properties();
+    public static String getOrientdbUrl(){
         ArrayList<String> ssh = getUrlListByName("orientdbUrl");
-
-        System.out.println(ssh.get(0));
+//        ArrayList<String> ssh1 = getUrlListByName("orientdbcluster");
+        String url = ssh.get(0);
+//        String url1 = ssh1.get(0);
+//        String orientdbUrl = "remote:"+url+"/"+";"+url1+"/";
+        String orientdbUrl = "remote:"+url+"/";
+//        System.out.println(ssh.get(0));
+        return orientdbUrl;
     }
 
 
