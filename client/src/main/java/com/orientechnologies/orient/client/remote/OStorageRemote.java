@@ -1753,6 +1753,7 @@ public class OStorageRemote implements OStorageProxy, ORemotePushHandler, OStora
 
   protected void openRemoteDatabase() throws IOException {
     final String currentURL = getNextAvailableServerURL(true, getCurrentSession());
+    System.out.println(currentURL);
     openRemoteDatabase(currentURL);
   }
 

@@ -20,7 +20,9 @@ public abstract class MMDB {
       return the category in which he/she has bought the largest number of products,
       and return the tag which he/she has engaged the greatest times in the posts.*/
 
-    abstract long Q1(String PersonId,OrientdbEnum orientdbEnum,String dbUrl);
+    abstract Object Connection(String database);
+
+    abstract long Q1(String PersonId, OrientdbEnum orientdbEnum, String dbUrl);
     
     /* Query 2. For a given product during a given period, find the people who commented
       or posted on it, and had bought it.

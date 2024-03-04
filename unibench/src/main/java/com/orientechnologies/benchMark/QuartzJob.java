@@ -20,7 +20,7 @@ public class QuartzJob {
                 .startNow()//立即生效
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                         //每隔600s执行一次
-                        .withIntervalInSeconds(3600)
+                        .withIntervalInSeconds(5400)
                         //一直执行
                         .repeatForever()).build();
 

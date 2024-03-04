@@ -46,8 +46,13 @@ public class OrientQuery extends MMDB {
 		  return conn;
 	}
 
+	@Override
+	Object Connection(String database) {
+		return null;
+	}
 
-    @Override
+
+	@Override
 	public long Q1(String PersonId,OrientdbEnum orientdbEnum,String dbUrl) {
 		long time;
 		String OQ1="Select $profile,$orders,$feedback,$posts,$list1,$list2 "

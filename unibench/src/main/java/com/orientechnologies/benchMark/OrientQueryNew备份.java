@@ -46,6 +46,11 @@ public class OrientQueryNew备份 extends MMDB {
 		  return null;
 	}
 
+	@Override
+	Object Connection(String database) {
+		return null;
+	}
+
 	public OrientQueryNew备份(String url){
 		Properties properties = ConfigUtils.getConfig(PropertiesEnum.ORIENTDB);
 //		String database = orientdbEnum.getName();
@@ -58,7 +63,7 @@ public class OrientQueryNew备份 extends MMDB {
 		SF1db = orientDB.open(OrientdbEnum.SF1.getName(), username, password, config);
 		SF10db = orientDB.open(OrientdbEnum.SF10.getName(), username, password, config);
 		SF30db = orientDB.open(OrientdbEnum.SF30.getName(), username, password, config);
-		SF100db = orientDB.open(OrientdbEnum.SF100.getName(), username, password, config);
+//		SF100db = orientDB.open(OrientdbEnum.SF100.getName(), username, password, config);
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -272,15 +277,15 @@ public class OrientQueryNew备份 extends MMDB {
 		//		this.Connection(orientdbEnum, dbUrl);
 		long millisStart1 = System.currentTimeMillis();
 		String name = orientdbEnum.getName();
-		if(name==OrientdbEnum.SF1.getName()){
-			SF1db.query(OQ9);
-		}else if(name==OrientdbEnum.SF10.getName()){
-			SF10db.query(OQ9);
-		}else if(name==OrientdbEnum.SF30.getName()){
-			SF30db.query(OQ9);
-		}else if(name==OrientdbEnum.SF100.getName()){
-			SF100db.query(OQ9);
-		}
+//		if(name==OrientdbEnum.SF1.getName()){
+//			SF1db.query(OQ9);
+//		}else if(name==OrientdbEnum.SF10.getName()){
+//			SF10db.query(OQ9);
+//		}else if(name==OrientdbEnum.SF30.getName()){
+//			SF30db.query(OQ9);
+//		}else if(name==OrientdbEnum.SF100.getName()){
+//			SF100db.query(OQ9);
+//		}
 		long millisEnd1 = System.currentTimeMillis();
 		System.out.println("Query 9 took "+(millisEnd1 - millisStart1) + " ms");
 //		oDatabaseDocument.close();
@@ -295,15 +300,15 @@ public class OrientQueryNew备份 extends MMDB {
 		//		this.Connection(orientdbEnum, dbUrl);
 		long millisStart1 = System.currentTimeMillis();
 		String name = orientdbEnum.getName();
-		if(name==OrientdbEnum.SF1.getName()){
-			SF1db.query(OQ10);
-		}else if(name==OrientdbEnum.SF10.getName()){
-			SF10db.query(OQ10);
-		}else if(name==OrientdbEnum.SF30.getName()){
-			SF30db.query(OQ10);
-		}else if(name==OrientdbEnum.SF100.getName()){
-			SF100db.query(OQ10);
-		}
+//		if(name==OrientdbEnum.SF1.getName()){
+//			SF1db.query(OQ10);
+//		}else if(name==OrientdbEnum.SF10.getName()){
+//			SF10db.query(OQ10);
+//		}else if(name==OrientdbEnum.SF30.getName()){
+//			SF30db.query(OQ10);
+//		}else if(name==OrientdbEnum.SF100.getName()){
+//			SF100db.query(OQ10);
+//		}
 		long millisEnd1 = System.currentTimeMillis();
 		System.out.println("Query 10 took "+(millisEnd1 - millisStart1) + " ms");
 //		oDatabaseDocument.close();

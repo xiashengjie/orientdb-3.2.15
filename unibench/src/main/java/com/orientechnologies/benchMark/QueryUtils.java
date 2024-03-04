@@ -19,7 +19,8 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author xsj
@@ -43,7 +44,8 @@ public class QueryUtils {
      */
     public static long runQuery(String query,OrientdbEnum orientdbEnum,String  dbUrl) throws Exception{
 //           MMDB db = new OrientQueryNew();
-           MMDB db = new OrientQuery();
+           MMDB db = new Arango();
+//           MMDB db = new OrientQuery();
         System.out.println(query+" is running");
 //        String dbUrl = "";
         Path currentDir = Paths.get(".");
@@ -109,7 +111,8 @@ public class QueryUtils {
                     cacheClean,mixed,properties.getProperty("orientdb.cpu"),
                     properties.getProperty("orientdb.pod"),
                     properties.getProperty("minio.pod"));
-            File file =new File("orientdb-juicefs-new.txt");
+//            File file =new File("orientdb-juicefs-new-new.txt");
+            File file =new File("arangodb-juicefs-new-new.txt");
             if(!file.exists()){
                 file.createNewFile();
             }
@@ -131,6 +134,17 @@ public class QueryUtils {
         System.out.println("----------------");
         System.out.println("----------------");
         System.out.println("----------------");
+        // 创建一个DateTimeFormatter对象，用于定义时间输出的格式
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // 获取当前的LocalDateTime对象
+        LocalDateTime now = LocalDateTime.now();
+
+        // 使用DateTimeFormatter对象格式化当前时间
+        String formattedDateTime = now.format(formatter);
+
+        // 打印格式化后的当前时间
+        System.out.println("当前的日期和时间是: " + formattedDateTime);
     }
 
     public static void refreshDatabase(OrientdbEnum orientdbEnum){
@@ -175,7 +189,7 @@ public class QueryUtils {
     /**
      * 执行查询并将结果写入文件
      */
-    public static void resultToFile(String taskName,OrientdbEnum orientdbEnum,String query, int threads, boolean cacheClean,boolean mixed,String  dbUrl){
+    public static void resultToFile(String taskName,OrientdbEnum orientdbEnum,String query, int threads, boolean cacheClean,boolean mixed,String  dbUrl) throws IOException {
         long[] millisStart = new long[1];
         long[] millisEnd = new long[1];
         String[] status = new String[1];
@@ -183,6 +197,16 @@ public class QueryUtils {
         System.out.println("数据库是："+database);
         System.out.println("将要执行的查询是："+query);
 
+        String content = String.format("%s,%s,%s,%s,%s\n",
+                taskName,database,query,System.currentTimeMillis(),threads);
+        File file =new File("arangodb-juicefs-new-new-all.txt");
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        //使用true，即进行append file
+        FileWriter fileWriter = new FileWriter(file.getName(),true);
+        fileWriter.write(content);
+        fileWriter.close();
 
         status[0] = "success";
         try {

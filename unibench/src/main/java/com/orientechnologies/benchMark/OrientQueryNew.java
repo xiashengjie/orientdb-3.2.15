@@ -6,6 +6,7 @@ import com.orientechnologies.orient.core.db.ODatabaseSession;
 import com.orientechnologies.orient.core.db.OrientDB;
 import com.orientechnologies.orient.core.db.OrientDBConfig;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocument;
+import com.orientechnologies.orient.core.sql.executor.OResultSet;
 import com.orientechnologies.orient.jdbc.OrientJdbcDriver;
 import com.orientechnologies.utils.ConfigUtils;
 import com.orientechnologies.utils.OrientdbEnum;
@@ -38,7 +39,8 @@ public class OrientQueryNew extends MMDB {
 		String username = properties.getProperty("database.username");
 		String password = properties.getProperty("database.password");
 		OrientDB orientDB = new OrientDB(url, OrientDBConfig.defaultConfig());
-		OrientDBConfig config = OrientDBConfig.builder().addConfig(CLIENT_CONNECTION_STRATEGY, "ROUND_ROBIN_CONNECT").build();
+		OrientDBConfig config = OrientDBConfig.builder().addConfig(CLIENT_CONNECTION_STRATEGY, "ROUND_ROBIN_REQUEST").build();
+//		OrientDBConfig config = OrientDBConfig.builder().addConfig(CLIENT_CONNECTION_STRATEGY, "STICKY").build();
 		db = orientDB.open(database, username, password, config);
 		OStorageRemote storage = (OStorageRemote) ((ODatabaseDocumentInternal) db).getStorage();
 		List<String> serverURLs = storage.getServerURLs();
@@ -48,6 +50,11 @@ public class OrientQueryNew extends MMDB {
 		e.printStackTrace();
 	}
 		  return db;
+	}
+
+	@Override
+	Object Connection(String database) {
+		return null;
 	}
 
 //	public OrientQueryNew (String url){
@@ -202,7 +209,7 @@ public class OrientQueryNew extends MMDB {
 		ODatabaseDocument oDatabaseDocument = this.Connection(orientdbEnum, dbUrl);
 		long millisStart1 = System.currentTimeMillis();
 		String name = orientdbEnum.getName();
-		oDatabaseDocument.query(OQ9);
+		OResultSet query = oDatabaseDocument.query(OQ9);
 		long millisEnd1 = System.currentTimeMillis();
 		System.out.println("Query 9 took "+(millisEnd1 - millisStart1) + " ms");
 		oDatabaseDocument.close();

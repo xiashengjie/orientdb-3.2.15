@@ -1,4 +1,4 @@
-//package com.orientechnologies.benchMark;
+package com.orientechnologies.benchMark;//package com.orientechnologies.benchMark;
 //
 //import org.quartz.*;
 //import org.quartz.impl.StdSchedulerFactory;
@@ -46,3 +46,23 @@
 //}
 //
 //
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class QuartzJobOne {
+
+    public static void main(String[] args) {
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+        // 设置一个Runnable任务
+        Runnable task = () -> {
+            // 这里写你要执行的任务代码
+            Threads.executeQuery();
+            System.out.println("任务执行了，当前时间：" + System.currentTimeMillis());
+        };
+
+        // 设置初始延迟为半小时（1800000毫秒），之后每小时（3600000毫秒）执行一次
+        executor.scheduleAtFixedRate(task, 7200000, 5400000, TimeUnit.MILLISECONDS);
+    }
+}

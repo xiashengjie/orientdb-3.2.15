@@ -7,18 +7,35 @@ import com.orientechnologies.utils.PropertiesEnum;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 
+import java.io.IOException;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.*;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 /**
  * @author xsj
  */
 public class Threads implements Job {
 
+//    "remote:122.51.75.59:9024",,"remote:122.51.75.59:9028"
     private final static String [] QUERY_LIST = new String[]{"Q1","Q2","Q3","Q4","Q5","Q7","Q6","Q8","Q9","Q10"};
+//    private final static String [] QUERY_LIST = new String[]{"Q10"};
+//    private final static String [] SERVER_LIST = new String[]{"remote:192.168.103.95:2424","remote:192.168.103.135:2425","remote:192.168.103.80:2424"};
+//    private final static String [] SERVER_LIST = new String[]{"remote:122.51.75.59:9025","remote:122.51.75.59:9026","remote:122.51.75.59:9027"};
+//    private final static String [] SERVER_LIST = new String[]{"remote:122.51.75.59:9025","remote:122.51.75.59:9027","remote:122.51.75.59:9028"};
+    private final static String [] SERVER_LIST = new String[]{"122.51.75.59:8530","122.51.75.59:8531","122.51.75.59:8532"};
+//    private final static String [] SERVER_LIST = new String[]{"remote:2.tcp.vip.cpolar.cn:12880","remote:2.tcp.vip.cpolar.cn:11321","remote:3.tcp.vip.cpolar.cn:12735"};
 //    private final static String [] QUERY_LIST = new String[]{"Q7"};
     public static void main(String[] args) {
+
+//        try {
+//            // 休眠半小时（30分钟），即30 * 60 * 1000 毫秒
+//            Thread.sleep(30 * 60 * 1000);
+//        } catch (InterruptedException e) {
+//            // 处理中断异常
+//            e.printStackTrace();
+//        }
         executeQuery();
     }
 
@@ -64,18 +81,39 @@ public class Threads implements Job {
                 new ThreadPoolExecutor.DiscardOldestPolicy());
         long currentTimeMillis = System.currentTimeMillis();
         String taskName = "task"+currentTimeMillis;
-        String dbUrl = CpolarUtils.getOrientdbUrl();
-        System.out.println(dbUrl);
-        //String dbUrl = "remote:169.254.187.175:2424/";
+//        String dbUrl = CpolarUtils.getOrientdbUrl();
+//        System.out.println(dbUrl);
+//        String dbUrl = "remote:localhost:2424;localhost:2425";
+//        String dbUrl = "remote:192.168.10.127:2424;192.168.10.127:2425/";
+//        String dbUrl = "remote:2.tcp.vip.cpolar.cn:12880;2.tcp.vip.cpolar.cn:11321;3.tcp.vip.cpolar.cn:12735/";
+//        String dbUrl = "remote:2.tcp.vip.cpolar.cn:11321/";
         // Submit multiple tasks
 //        MMDB db = new OrientQueryNew(dbUrl);
 //        MMDB db = new OrientQueryNew();
+        int j = 0;
         for (int i = 0; i < threads; i++) {
             String query = QueryUtils.randomChoice(QUERY_LIST);
+//            String server = QueryUtils.randomChoice(SERVER_LIST);
+//            String server = "remote:122.51.75.59:9024";
+//            String server = "122.51.75.59";
+            String server = SERVER_LIST[j];
+//            System.out.println(server);
+//            System.out.println(j);
+
+            j = j+1;
+            if (j==SERVER_LIST.length){
+                j = 0;
+            }
+//            String server = "remote:192.168.103.95:2424;192.168.103.135:2424";
             OrientdbEnum orientdbEnum = OrientdbEnum.values()[new Random().nextInt(OrientdbEnum.values().length)];
 //            OrientdbEnum orientdbEnum = OrientdbEnum.SF1;
+            System.out.println(query + orientdbEnum.getName());
                 executor.submit(() -> {
-                    QueryUtils.resultToFile(taskName,orientdbEnum,query,threads,false,true,dbUrl);
+                    try {
+                        QueryUtils.resultToFile(taskName,orientdbEnum,query,threads,false,true,server);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
         }
 //        db.close();
