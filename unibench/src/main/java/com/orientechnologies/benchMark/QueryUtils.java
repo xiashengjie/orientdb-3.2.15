@@ -43,8 +43,8 @@ public class QueryUtils {
      * 执行对应查询
      */
     public static long runQuery(String query,OrientdbEnum orientdbEnum,String  dbUrl) throws Exception{
-//           MMDB db = new OrientQueryNew();
-           MMDB db = new Arango();
+           MMDB db = new OrientQueryNew();
+//           MMDB db = new Arango();
 //           MMDB db = new OrientQuery();
         System.out.println(query+" is running");
 //        String dbUrl = "";
@@ -111,8 +111,8 @@ public class QueryUtils {
                     cacheClean,mixed,properties.getProperty("orientdb.cpu"),
                     properties.getProperty("orientdb.pod"),
                     properties.getProperty("minio.pod"));
-//            File file =new File("orientdb-juicefs-new-new.txt");
-            File file =new File("arangodb-juicefs-new-new.txt");
+            File file =new File("orientdb-juicefs-new-new.txt");
+//            File file =new File("arangodb-juicefs-new-new.txt");
             if(!file.exists()){
                 file.createNewFile();
             }

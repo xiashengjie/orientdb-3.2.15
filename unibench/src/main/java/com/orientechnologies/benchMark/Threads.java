@@ -23,8 +23,8 @@ public class Threads implements Job {
 //    private final static String [] QUERY_LIST = new String[]{"Q10"};
 //    private final static String [] SERVER_LIST = new String[]{"remote:192.168.103.95:2424","remote:192.168.103.135:2425","remote:192.168.103.80:2424"};
 //    private final static String [] SERVER_LIST = new String[]{"remote:122.51.75.59:9025","remote:122.51.75.59:9026","remote:122.51.75.59:9027"};
-//    private final static String [] SERVER_LIST = new String[]{"remote:122.51.75.59:9025","remote:122.51.75.59:9027","remote:122.51.75.59:9028"};
-    private final static String [] SERVER_LIST = new String[]{"122.51.75.59:8530","122.51.75.59:8531","122.51.75.59:8532"};
+    private final static String [] SERVER_LIST = new String[]{"remote:122.51.75.59:9025","remote:122.51.75.59:9027","remote:122.51.75.59:9028","remote:122.51.75.59:9028","remote:122.51.75.59:9027","remote:122.51.75.59:9025"};
+//    private final static String [] SERVER_LIST = new String[]{"122.51.75.59:8530","122.51.75.59:8531","122.51.75.59:8532"};
 //    private final static String [] SERVER_LIST = new String[]{"remote:2.tcp.vip.cpolar.cn:12880","remote:2.tcp.vip.cpolar.cn:11321","remote:3.tcp.vip.cpolar.cn:12735"};
 //    private final static String [] QUERY_LIST = new String[]{"Q7"};
     public static void main(String[] args) {
@@ -53,8 +53,8 @@ public class Threads implements Job {
         Properties properties = ConfigUtils.getConfig(PropertiesEnum.ORIENTDB);
 
         java.util.Random random = new java.util.Random();
-        int threads = random.nextInt(Integer.parseInt(properties.getProperty("database.threadsArea")))+1;
-//        int threads = 1;
+//        int threads = random.nextInt(Integer.parseInt(properties.getProperty("database.threadsArea")))+1;
+        int threads = 200;
         System.out.println("开启的线程数："+threads);
 
 /*      corePoolSize:核心线程池大小
@@ -91,22 +91,36 @@ public class Threads implements Job {
 //        MMDB db = new OrientQueryNew(dbUrl);
 //        MMDB db = new OrientQueryNew();
         int j = 0;
+        int q = 1;
+        int d = 1;
         for (int i = 0; i < threads; i++) {
-            String query = QueryUtils.randomChoice(QUERY_LIST);
+//            String query = QueryUtils.randomChoice(QUERY_LIST);
+            String query = "Q"+q;
+            q = q+1;
+            if(q>10)q=1;
 //            String server = QueryUtils.randomChoice(SERVER_LIST);
-//            String server = "remote:122.51.75.59:9024";
+//            String server = "remote:122.51.75.59:9025";
 //            String server = "122.51.75.59";
             String server = SERVER_LIST[j];
 //            System.out.println(server);
 //            System.out.println(j);
-
             j = j+1;
             if (j==SERVER_LIST.length){
                 j = 0;
             }
+            OrientdbEnum orientdbEnum;
 //            String server = "remote:192.168.103.95:2424;192.168.103.135:2424";
-            OrientdbEnum orientdbEnum = OrientdbEnum.values()[new Random().nextInt(OrientdbEnum.values().length)];
-//            OrientdbEnum orientdbEnum = OrientdbEnum.SF1;
+//            OrientdbEnum orientdbEnum = OrientdbEnum.values()[new Random().nextInt(OrientdbEnum.values().length)];
+            if (d==1){
+                orientdbEnum = OrientdbEnum.SF1;
+            } else if (d==2) {
+                orientdbEnum = OrientdbEnum.SF10;
+            }else {
+                orientdbEnum = OrientdbEnum.SF30;
+            }
+            d = d+1;
+            if (d>3)d=1;
+//            OrientdbEnum orientdbEnum = OrientdbEnum.SF10;
             System.out.println(query + orientdbEnum.getName());
                 executor.submit(() -> {
                     try {

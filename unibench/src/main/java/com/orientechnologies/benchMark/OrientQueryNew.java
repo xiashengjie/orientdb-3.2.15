@@ -42,6 +42,7 @@ public class OrientQueryNew extends MMDB {
 		OrientDBConfig config = OrientDBConfig.builder().addConfig(CLIENT_CONNECTION_STRATEGY, "ROUND_ROBIN_REQUEST").build();
 //		OrientDBConfig config = OrientDBConfig.builder().addConfig(CLIENT_CONNECTION_STRATEGY, "STICKY").build();
 		db = orientDB.open(database, username, password, config);
+		db.reload();
 		OStorageRemote storage = (OStorageRemote) ((ODatabaseDocumentInternal) db).getStorage();
 		List<String> serverURLs = storage.getServerURLs();
 		System.out.println(serverURLs.toString());
